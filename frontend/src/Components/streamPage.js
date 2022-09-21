@@ -106,28 +106,47 @@ function StreamPage() {
     //     }
     //     )
     // }
+    const getBase64StringFromDataURL = (dataURL) =>
+        dataURL.replace('data:', '').replace(/^.+,/, '');
 
     const getImage = (data) => {
         console.log(data, "data getImage")
-        axios.get(`http://localhost:5000/downloadImage/${data.fileName}`).then((res) => {
-            // console.log(res,"data for image")
-            const a = document.createElement("a");
-            let uri = `http://localhost:5000/downloadImage/${data.fileName}`;
-            // a.download = "";
-            a.href = uri;
-            a.target = "hiddenIframe"
-            // a.download = "images"
-            a.download = uri.substring(uri.lastIndexOf('/') + 1);
-            document.body.appendChild(a);
-            // a.setAttribute('Download', ` `);
-            // window.open(uri, 'Download');
-            a.click();
+        // axios.get(`http://localhost:5000/downloadImage/${data.fileName}`)
+        fetch(`http://localhost:5000/downloadImage/${data.fileName}`, {
+            method: "GET",
+            headers: {},
+        })
+
+            .then((response) => {
+
+                // console.log(res,"data for image")
+                // const a = document.createElement("a");
+                // let uri = `http://localhost:5000/downloadImage/${data.fileName}`;
+                // // a.download = "";
+                // a.href = uri;
+                // a.target = "hiddenIframe"
+                // // a.download = "images"
+                // a.download = uri.substring(uri.lastIndexOf('/') + 1);
+
+                // document.body.appendChild(a);
+                // // a.setAttribute('Download', ` `);
+                // // window.open(uri, 'Download');
+                // a.click();
+
+                response.arrayBuffer().then(function (buffer) {
+                    const url = window.URL.createObjectURL(new Blob([buffer]));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", data.fileName.split("_")[0]); //or any other extension
+                    document.body.appendChild(link);
+                    link.click();
+                });
 
 
-        }).catch((err) => {
-            console.log(err);
-        }
-        )
+            }).catch((err) => {
+                console.log(err);
+            }
+            )
     }
 
     return (
